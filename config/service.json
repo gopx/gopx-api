@@ -1,0 +1,9 @@
+{
+  "host": "0.0.0.0",
+  "useHTTP": true,
+  "HTTPPort": 1202,
+  "useHTTPS": false,
+  "HTTPSPort": 1203,
+  "certFile": "config/cert/server.crt",
+  "keyFile": "config/cert/server.key"
+}
