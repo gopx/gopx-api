@@ -7,9 +7,9 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+	"time"
 
 	"gopx.io/gopx-api/pkg/config"
-	"gopx.io/gopx-api/pkg/constants"
 	"gopx.io/gopx-api/pkg/log"
 	"gopx.io/gopx-api/pkg/route"
 )
@@ -40,14 +40,14 @@ func startServer() {
 
 func startHTTP() {
 	addr := httpAddr()
-	router := route.GoPXAPIRouter()
+	r := route.Router()
 	server := &http.Server{
 		Addr:              addr,
-		Handler:           router,
-		ReadTimeout:       constants.ServerReadTimeout,
-		ReadHeaderTimeout: constants.ServerReadTimeout,
-		WriteTimeout:      constants.ServerWriteTimeout,
-		IdleTimeout:       constants.ServerIdleTimeout,
+		Handler:           r,
+		ReadTimeout:       config.Service.ReadTimeout * time.Second,
+		ReadHeaderTimeout: config.Service.ReadTimeout * time.Second,
+		WriteTimeout:      config.Service.WriteTimeout * time.Second,
+		IdleTimeout:       config.Service.IdleTimeout * time.Second,
 		ErrorLog:          serverLogger,
 	}
 
@@ -58,14 +58,14 @@ func startHTTP() {
 
 func startHTTPS() {
 	addr := httpsAddr()
-	router := route.GoPXAPIRouter()
+	r := route.Router()
 	server := &http.Server{
 		Addr:              addr,
-		Handler:           router,
-		ReadTimeout:       constants.ServerReadTimeout,
-		ReadHeaderTimeout: constants.ServerReadTimeout,
-		WriteTimeout:      constants.ServerWriteTimeout,
-		IdleTimeout:       constants.ServerIdleTimeout,
+		Handler:           r,
+		ReadTimeout:       config.Service.ReadTimeout * time.Second,
+		ReadHeaderTimeout: config.Service.ReadTimeout * time.Second,
+		WriteTimeout:      config.Service.WriteTimeout * time.Second,
+		IdleTimeout:       config.Service.IdleTimeout * time.Second,
 		ErrorLog:          serverLogger,
 	}
 

@@ -3,25 +3,29 @@ package config
 import (
 	"encoding/json"
 	"io/ioutil"
+	"time"
 
 	"gopx.io/gopx-api/pkg/log"
 )
 
-// ServiceConfigPath holds Registry service related configuration file path.
+// ServiceConfigPath holds API service related configuration file path.
 const ServiceConfigPath = "./config/service.json"
 
-// ServiceConfig represents Registry service related configurations.
+// ServiceConfig represents API service related configurations.
 type ServiceConfig struct {
-	Host      string `json:"host"`
-	UseHTTP   bool   `json:"useHTTP"`
-	HTTPPort  int    `json:"HTTPPort"`
-	UseHTTPS  bool   `json:"useHTTPS"`
-	HTTPSPort int    `json:"HTTPSPort"`
-	CertFile  string `json:"certFile"`
-	KeyFile   string `json:"keyFile"`
+	Host         string        `json:"host"`
+	UseHTTP      bool          `json:"useHTTP"`
+	HTTPPort     int           `json:"HTTPPort"`
+	UseHTTPS     bool          `json:"useHTTPS"`
+	HTTPSPort    int           `json:"HTTPSPort"`
+	CertFile     string        `json:"certFile"`
+	KeyFile      string        `json:"keyFile"`
+	ReadTimeout  time.Duration `json:"readTimeout"`
+	WriteTimeout time.Duration `json:"writeTimeout"`
+	IdleTimeout  time.Duration `json:"idleTimeout"`
 }
 
-// Service holds loaded Registry service related configurations.
+// Service holds loaded API service related configurations.
 var Service = new(ServiceConfig)
 
 func init() {

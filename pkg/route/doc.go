@@ -1,4 +1,4 @@
 /*
-Package route provides interfaces to handle GoPX Registry API routings.
+Package route registers main application logics for various API routes.
 */
 package route

@@ -1,4 +1,4 @@
 /*
-Package v1 handles API routes specific to API version v1.
+Package v1 contains the API definitions for version v1.
 */
 package v1

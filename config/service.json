@@ -5,5 +5,8 @@
   "useHTTPS": false,
   "HTTPSPort": 1203,
   "certFile": "config/cert/server.crt",
-  "keyFile": "config/cert/server.key"
+  "keyFile": "config/cert/server.key",
+  "readTimeout": 15,
+  "writeTimeout": 15,
+  "idleTimeout": 15
 }

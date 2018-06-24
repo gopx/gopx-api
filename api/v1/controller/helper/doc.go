@@ -1,4 +1,4 @@
 /*
-Package helper provides various helper controllers.
+Package helper provides miscellaneous helper controllers.
 */
 package helper
