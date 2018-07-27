@@ -1,6 +1,9 @@
 package handler
 
-import "net/http"
+import (
+	"io"
+	"net/http"
+)
 
 // UsersGET returns the list of all users.
 // Request: GET /users?page=1&limit=10&sort=packages&order=asc
@@ -10,7 +13,7 @@ import "net/http"
 // 3. updated
 // 4. username
 func UsersGET(w http.ResponseWriter, r *http.Request) {
-
+	io.WriteString(w, "")
 }
 
 // SingleUserGET returns the public information about a single user.

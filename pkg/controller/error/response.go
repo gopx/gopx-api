@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"gopx.io/gopx-api/pkg/log"
+	"gopx.io/gopx-common/log"
 )
 
 type errorResponse struct {

@@ -10,11 +10,12 @@ import "net/http"
 // 3. updated
 // 4. name
 func PackagesGET(w http.ResponseWriter, r *http.Request) {
-
+	w.Write([]byte("Hii"))
 }
 
-// SinglePackageGET returns the info about a single package.
+// SinglePackageGET returns the info about a single package or a specific version..
 // Request: GET /packages/:packageName
+// Specific version: GET /packages/:packageName?v=1.0.1
 func SinglePackageGET(w http.ResponseWriter, r *http.Request) {
 
 }
@@ -71,5 +72,12 @@ func VersionsGET(w http.ResponseWriter, r *http.Request) {
 // SinglePackageVersionsGET returns the version histories of a single package.
 // Request: GET /versions/:packageName
 func SinglePackageVersionsGET(w http.ResponseWriter, r *http.Request) {
+
+}
+
+// SinglePackageFilesGET returns the content of a package file.
+// Request: GET /packages/:packageName/files?path="README.md"&v=1.0.1
+// Get file list: GET /packages/:packageName/files?v=1.0.1
+func SinglePackageFilesGET(w http.ResponseWriter, r *http.Request) {
 
 }

@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"time"
 
-	"gopx.io/gopx-api/pkg/log"
+	"gopx.io/gopx-common/log"
 )
 
 // ServiceConfigPath holds API service related configuration file path.

@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"gopx.io/gopx-api/api/v1"
 	"gopx.io/gopx-api/pkg/controller/error"
-	"gopx.io/gopx-api/pkg/log"
+	"gopx.io/gopx-common/log"
 )
 
 // Router registers the API specific routes.

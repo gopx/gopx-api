@@ -54,6 +54,10 @@ func registerPackageRoutes(r *mux.Router) {
 		Methods("DELETE").
 		HandlerFunc(handler.SinglePackageDELETE)
 
+	r.Path("/packages/{packageName}/files").
+		Methods("GET").
+		HandlerFunc(handler.SinglePackageFilesGET)
+
 	r.Path("/search").
 		Methods("GET").
 		HandlerFunc(handler.SearchGET)
@@ -68,7 +72,7 @@ func registerPackageRoutes(r *mux.Router) {
 
 	r.Path("/versions").
 		Methods("GET").
-		HandlerFunc(handler.DownloadsGET)
+		HandlerFunc(handler.VersionsGET)
 
 	r.Path("/versions/{packageName}").
 		Methods("GET").

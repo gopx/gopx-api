@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	"gopx.io/gopx-api/pkg/log"
+	"gopx.io/gopx-common/log"
 )
 
 // EnvConfigPath holds the environment variables file path.

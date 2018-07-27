@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"gopx.io/gopx-api/pkg/config"
-	"gopx.io/gopx-api/pkg/log"
 	"gopx.io/gopx-api/pkg/route"
+	"gopx.io/gopx-common/log"
 )
 
 var serverLogger = golog.New(os.Stdout, "", golog.Ldate|golog.Ltime|golog.Lshortfile)
