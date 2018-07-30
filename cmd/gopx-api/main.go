@@ -22,6 +22,34 @@ func init() {
 
 func main() {
 	startServer()
+	//test()
+}
+
+func test() {
+
+	// sq := user.SearchQuery{
+	// 	// SearchTerm: "",
+	// 	// In:         "email",
+	// 	Packages: "*..2",
+	// 	//	Location:   "India Kolkata",
+	// 	// Joined: "2016-01-07..2016-12-31",
+	// }
+	// pc := helper.PaginationConfig{
+	// 	Page:         80,
+	// 	PerPageCount: 100,
+	// }
+	// sc := helper.SortingConfig{
+	// 	SortBy: "packages",
+	// 	Order:  "ASC",
+	// }
+
+	// users, err := user.SearchUser(&sq, &pc, &sc)
+	// if err != nil {
+	// 	log.Fatal("%v", err)
+	// }
+	// for _, v := range users {
+	// 	log.Info("%v", *v)
+	// }
 }
 
 func startServer() {

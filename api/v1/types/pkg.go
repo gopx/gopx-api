@@ -1,6 +1,6 @@
 package types
 
-// Package represents a single GoPX package.
+// Package represents a single GoPx package.
 type Package struct {
 	Name           string `json:"name"`
 	Desc           string `json:"desc"`
