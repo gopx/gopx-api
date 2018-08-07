@@ -1,11 +1,13 @@
 package error
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 
+	"gopx.io/gopx-api/pkg/controller/helper"
 	"gopx.io/gopx-common/log"
 )
 
@@ -20,19 +22,25 @@ func setBasicHeaders(headers http.Header) {
 }
 
 func responseJSON(message string) ([]byte, error) {
+	buff := bytes.Buffer{}
+	enc := json.NewEncoder(&buff)
+	enc.SetIndent("", "  ")
+	enc.SetEscapeHTML(false)
+
 	resp := errorResponse{Message: message}
-	bytes, err := json.MarshalIndent(resp, "", "  ")
+	err := enc.Encode(resp)
 	if err != nil {
 		return nil, err
 	}
-	return bytes, nil
+
+	return buff.Bytes(), nil
 }
 
 func writeResponse(w http.ResponseWriter, statusCode int, message string) {
 	bytes, err := responseJSON(message)
 	if err != nil {
 		log.Error("Error: %s", err)
-		bytes = []byte(fmt.Sprintf("\"%s\"", message))
+		bytes = []byte(fmt.Sprintf("\"%s\"\n", message))
 	}
 
 	headers := w.Header()
@@ -43,5 +51,5 @@ func writeResponse(w http.ResponseWriter, statusCode int, message string) {
 	headers.Set("Status", fmt.Sprintf("%d %s", statusCode, http.StatusText(statusCode)))
 
 	w.WriteHeader(statusCode)
-	w.Write(bytes)
+	helper.WriteRespData(w, bytes)
 }

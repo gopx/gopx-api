@@ -90,7 +90,7 @@ func PrepareRelationalQueryClause(placeholderValues *[]interface{}, column, valu
 
 // PrepareInQualifierClause prepares SQL where-clauses based on
 // the search term and 'In' qualifier.
-func PrepareInQualifierClause(placeholderValues *[]interface{}, inColumns []string, searchTerm string, inValue string) (clause string) {
+func PrepareInQualifierClause(placeholderValues *[]interface{}, inColumns []string, inColumnsMap []string, searchTerm string, inValue string) (clause string) {
 	inClauses := []string{}
 	ins := strings.Split(inValue, ",")
 
@@ -99,7 +99,8 @@ func PrepareInQualifierClause(placeholderValues *[]interface{}, inColumns []stri
 			continue
 		}
 
-		PrepareMultiWordsQueryClause(&inClauses, placeholderValues, in, searchTerm)
+		dbCol := inColumnsMap[arr.FindStr(inColumns, in)]
+		PrepareMultiWordsQueryClause(&inClauses, placeholderValues, dbCol, searchTerm)
 	}
 
 	if len(inClauses) > 0 {

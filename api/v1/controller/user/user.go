@@ -17,7 +17,11 @@ import (
 
 // SearchQuery holds the query values while searching the users.
 // Search pattern: gopx in:username packages:<=100 location:india joined:2017-01-01..2017-12-31
-// Possible values of 'in' qualifier: username, email, name or any combination of them with comma separation.
+// Possible values of 'in' qualifier:
+// 	1. username
+//	2. email
+// 	3. name
+// 	4. or any combination of them with comma separation.
 // Note: Replace a whitespace with '+' character in query values.
 type SearchQuery struct {
 	SearchTerm string
@@ -45,11 +49,29 @@ type QueryRow struct {
 	Twitter       string
 	StackOverflow string
 	LinkedIn      string
+	APIKey        string
 }
 
-// SearchUser searches users according to the search query and returns a slice containing
+// MutationData holds user mutation data.
+type MutationData struct {
+	Name         *string
+	URL          *string
+	Organization *string
+	Location     *string
+	Social       *SocialAccountsMutationData
+}
+
+// SocialAccountsMutationData holds user social account mutation data.
+type SocialAccountsMutationData struct {
+	Github        *string `json:"github"`
+	Twitter       *string `json:"twitter"`
+	StackOverflow *string `json:"stackOverflow"`
+	LinkedIn      *string `json:"linkedin"`
+}
+
+// Search searches users according to the search query and returns a slice containing
 // the results.
-func SearchUser(q *SearchQuery, pc *helper.PaginationConfig, sc *helper.SortingConfig) (users []*QueryRow, err error) {
+func Search(q *SearchQuery, pc *helper.PaginationConfig, sc *helper.SortingConfig) (users []*QueryRow, err error) {
 	if q == nil {
 		q = &SearchQuery{}
 	}
@@ -75,7 +97,7 @@ func SearchUser(q *SearchQuery, pc *helper.PaginationConfig, sc *helper.SortingC
 
 	// Add filters for q.SearchTerm and q.In
 	if !str.IsEmpty(q.SearchTerm) {
-		inClause := helper.PrepareInQualifierClause(&placeholderValues, constants.UserQueryIns, q.SearchTerm, q.In)
+		inClause := helper.PrepareInQualifierClause(&placeholderValues, constants.UserQueryIns, constants.UserQueryInsDbMap, q.SearchTerm, q.In)
 		if !str.IsEmpty(inClause) {
 			whereClauses = append(whereClauses, inClause)
 		}
@@ -133,8 +155,8 @@ func SearchUser(q *SearchQuery, pc *helper.PaginationConfig, sc *helper.SortingC
 	if pc.Page <= 0 {
 		pc.Page = 1
 	}
-	if pc.PerPageCount <= 0 || pc.PerPageCount > uint64(constants.UsersQueryPageSize) {
-		pc.PerPageCount = uint64(constants.UsersQueryPageSize)
+	if pc.PerPageCount <= 0 || pc.PerPageCount > uint64(constants.UsersQueryMaxPageSize) {
+		pc.PerPageCount = uint64(constants.UsersQueryMaxPageSize)
 	}
 	qLimit, qOffset := pc.PerPageCount, (pc.Page-1)*pc.PerPageCount
 
@@ -143,7 +165,7 @@ func SearchUser(q *SearchQuery, pc *helper.PaginationConfig, sc *helper.SortingC
 	limitSt := fmt.Sprintf("%d", qLimit)
 	offsetSt := fmt.Sprintf("%d", qOffset)
 
-	users, err = QueryUser(whereClauseSt, sortBySt, limitSt, offsetSt, placeholderValues...)
+	users, err = Query(whereClauseSt, sortBySt, limitSt, offsetSt, placeholderValues...)
 	if err != nil {
 		err = errors.Wrap(err, "Failed to query users data from database")
 		return nil, err
@@ -152,23 +174,29 @@ func SearchUser(q *SearchQuery, pc *helper.PaginationConfig, sc *helper.SortingC
 	return users, nil
 }
 
-// QueryUser is a low-level function which queries user data from database
+// Query is a low-level function which queries user data from database
 // according to the input filters.
-func QueryUser(whereClause, sortBy, limit, offset string, args ...interface{}) (userRows []*QueryRow, err error) {
+func Query(whereClause, sortBy, limit, offset string, args ...interface{}) (userRows []*QueryRow, err error) {
 	sqlSt := `
 	SELECT
 	*
 	FROM
+  (SELECT
+	users.*, user_api_keys.api_key
+	FROM
 	(SELECT
 	users.id, users.name, users.packages_count, users.joined_at, users.email, users.is_public_email, users.username, users.password, users.avatar, users.url,
-	users.organization, users.location, user_social_accounts.github, user_social_accounts.twitter, user_social_accounts.stack_overflow,
-	user_social_accounts.linkedin
+	users.organization, users.location, user_social_accounts.github, user_social_accounts.twitter, user_social_accounts.stack_overflow, user_social_accounts.linkedin
 	FROM
 	(SELECT users.*, COUNT(packages.id) AS packages_count FROM users LEFT JOIN packages ON users.id = packages.owner_id GROUP BY users.id) AS users
 	INNER JOIN
 	user_social_accounts
 	ON
 	users.id = user_social_accounts.user_id) AS users
+	LEFT JOIN
+	user_api_keys
+	ON
+	users.id = user_api_keys.user_id) AS users
 	`
 
 	if !str.IsEmpty(whereClause) {
@@ -186,8 +214,6 @@ func QueryUser(whereClause, sortBy, limit, offset string, args ...interface{}) (
 	if !str.IsEmpty(offset) {
 		sqlSt = fmt.Sprintf("%s OFFSET %s", sqlSt, offset)
 	}
-
-	fmt.Println(sqlSt)
 
 	dbConn := database.Conn()
 
@@ -218,6 +244,7 @@ func QueryUser(whereClause, sortBy, limit, offset string, args ...interface{}) (
 		twitter       sql.RawBytes
 		stackOverflow sql.RawBytes
 		linkedIn      sql.RawBytes
+		apiKey        sql.RawBytes
 	)
 	for rows.Next() {
 		err := rows.Scan(
@@ -237,6 +264,7 @@ func QueryUser(whereClause, sortBy, limit, offset string, args ...interface{}) (
 			&twitter,
 			&stackOverflow,
 			&linkedIn,
+			&apiKey,
 		)
 		if err != nil {
 			err = errors.Wrap(err, "Failed to scan the user query result")
@@ -244,31 +272,135 @@ func QueryUser(whereClause, sortBy, limit, offset string, args ...interface{}) (
 		}
 
 		qr := &QueryRow{
-			id,
-			name,
-			packagesCount,
-			joinedAt,
-			email,
-			misc.TerOpt(isPublicEmail == 1, true, false).(bool),
-			username,
-			password,
-			avatar,
-			string(url),
-			string(organization),
-			string(location),
-			string(github),
-			string(twitter),
-			string(stackOverflow),
-			string(linkedIn),
+			ID:            id,
+			Name:          name,
+			PackagesCount: packagesCount,
+			JoinedAt:      joinedAt,
+			Email:         email,
+			IsPublicEmail: misc.TerOpt(isPublicEmail == 1, true, false).(bool),
+			Username:      username,
+			Password:      password,
+			Avatar:        avatar,
+			URL:           string(url),
+			Organization:  string(organization),
+			Location:      string(location),
+			Github:        string(github),
+			Twitter:       string(twitter),
+			StackOverflow: string(stackOverflow),
+			LinkedIn:      string(linkedIn),
+			APIKey:        string(apiKey),
 		}
 
 		userRows = append(userRows, qr)
 	}
 
 	if err := rows.Err(); err != nil {
-		err = errors.Wrap(err, "Failed to fetch the users query result")
+		err = errors.Wrap(err, "Failed to fetch the user query result")
 		return nil, err
 	}
 
 	return userRows, nil
+}
+
+// UpdateInfo updates user data and returns the updated one.
+func UpdateInfo(userID uint64, data *MutationData) (user *QueryRow, err error) {
+	sqlStUsers := []string{}
+	placeholderValUsers := []interface{}{}
+
+	if data.Name != nil {
+		sqlStUsers = append(sqlStUsers, "name = ?")
+		placeholderValUsers = append(placeholderValUsers, *data.Name)
+	}
+
+	if data.URL != nil {
+		sqlStUsers = append(sqlStUsers, "url = ?")
+		placeholderValUsers = append(placeholderValUsers, *data.URL)
+	}
+
+	if data.Organization != nil {
+		sqlStUsers = append(sqlStUsers, "organization = ?")
+		placeholderValUsers = append(placeholderValUsers, *data.Organization)
+	}
+
+	if data.Location != nil {
+		sqlStUsers = append(sqlStUsers, "location = ?")
+		placeholderValUsers = append(placeholderValUsers, *data.Location)
+	}
+
+	sqlStUserSocial := []string{}
+	placeholderValUserSocial := []interface{}{}
+
+	if data.Social.Github != nil {
+		sqlStUserSocial = append(sqlStUserSocial, "github = ?")
+		placeholderValUserSocial = append(placeholderValUserSocial, *data.Social.Github)
+	}
+
+	if data.Social.Twitter != nil {
+		sqlStUserSocial = append(sqlStUserSocial, "twitter = ?")
+		placeholderValUserSocial = append(placeholderValUserSocial, *data.Social.Twitter)
+	}
+
+	if data.Social.StackOverflow != nil {
+		sqlStUserSocial = append(sqlStUserSocial, "stack_overflow = ?")
+		placeholderValUserSocial = append(placeholderValUserSocial, *data.Social.StackOverflow)
+	}
+
+	if data.Social.LinkedIn != nil {
+		sqlStUserSocial = append(sqlStUserSocial, "linkedin = ?")
+		placeholderValUserSocial = append(placeholderValUserSocial, *data.Social.LinkedIn)
+	}
+
+	dbConn := database.Conn()
+	tx, err := dbConn.Begin()
+	if err != nil {
+		err = errors.Wrap(err, "Failed to begin a transaction")
+		return
+	}
+
+	if len(sqlStUsers) > 0 {
+		st := fmt.Sprintf(`
+		UPDATE users
+		SET %s
+		WHERE id = ?`, strings.Join(sqlStUsers, ", "))
+		placeholderValUsers = append(placeholderValUsers, userID)
+
+		_, err = tx.Exec(st, placeholderValUsers...)
+		if err != nil {
+			tx.Rollback()
+			err = errors.Wrap(err, "Failed to update users table")
+			return
+		}
+	}
+
+	if len(sqlStUserSocial) > 0 {
+		st := fmt.Sprintf(`
+		UPDATE user_social_accounts
+		SET %s
+		WHERE user_id = ?`, strings.Join(sqlStUserSocial, ", "))
+		placeholderValUserSocial = append(placeholderValUserSocial, userID)
+
+		_, err = tx.Exec(st, placeholderValUserSocial...)
+		if err != nil {
+			tx.Rollback()
+			err = errors.Wrap(err, "Failed to update user_social_accounts table")
+			return
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		err = errors.Wrap(err, "Failed to commit changes of user data")
+		return
+	}
+
+	userRows, err := Query("id = ?", "id ASC", "1", "", userID)
+	if err != nil || len(userRows) < 1 {
+		err = errors.Wrap(err, "Failed to read updated user data")
+		return
+	}
+
+	user = userRows[0]
+
+	return
 }

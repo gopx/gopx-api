@@ -26,3 +26,20 @@ type UserSocialAccounts struct {
 	StackOverflow string `json:"stackOverflow"`
 	LinkedIn      string `json:"linkedin"`
 }
+
+// UserMutation holds user mutation data.
+type UserMutation struct {
+	Name         *string                     `json:"name"`
+	Blog         *string                     `json:"blog"`
+	Organization *string                     `json:"organization"`
+	Location     *string                     `json:"location"`
+	Social       *UserSocialAccountsMutation `json:"social"`
+}
+
+// UserSocialAccountsMutation holds user social account mutation data.
+type UserSocialAccountsMutation struct {
+	Github        *string `json:"github"`
+	Twitter       *string `json:"twitter"`
+	StackOverflow *string `json:"stackOverflow"`
+	LinkedIn      *string `json:"linkedin"`
+}

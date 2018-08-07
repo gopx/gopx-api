@@ -1,0 +1,32 @@
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Access-Control-Expose-Headers: Content-Length, Server, Date, Status
+Content-Length: 654
+Content-Type: application/json; charset=utf-8
+Server: GoPx.io
+Status: 200 OK
+Date: Tue, 07 Aug 2018 09:36:42 GMT
+
+{
+  "name": "gows",
+  "id": 502,
+  "desc": "Websocket implementation in Golang",
+  "owner": "mduffyn0",
+  "version": "0.6.3",
+  "downloads": 0,
+  "publishedAt": "2018-08-07T14:52:30+05:30",
+  "updatedAt": "2018-08-07T14:52:30+05:30",
+  "license": "MIT",
+  "homepage": "https://github.com/rousan/linkedin-auto-connect#readme",
+  "repositoryURL": "https://github.com/rousan/linkedin-auto-connect",
+  "documentationURL": "https://github.com/rousan/linkedin-auto-connect#readme",
+  "bugsURL": "https://github.com/rousan/linkedin-auto-connect/issues",
+  "engines": {
+    "go": "\u003e=1.02"
+  },
+  "os": [
+    "darwin:amd64",
+    "linux",
+    "windows"
+  ]
+}
