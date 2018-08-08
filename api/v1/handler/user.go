@@ -614,8 +614,6 @@ func CurrentUserPackagesPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(constants.PackageMetaFileNames[idx])
-
 	metaFileName := constants.PackageMetaFileNames[idx]
 	meta := types.PackageMetaData{}
 	if metaFileName == "gopx.json" {

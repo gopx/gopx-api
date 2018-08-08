@@ -23,7 +23,7 @@ type Package struct {
 	Os               []string  `json:"os"`
 }
 
-// Engines holds environment dependencies.
+// Engines holds package environment dependencies.
 type Engines struct {
 	Go string `json:"go"`
 }

@@ -51,7 +51,7 @@ const PackageNameMaxLength = 300
 const TempFileNamePrefixForPackageRegister = "gopx-pkg-upload-data-"
 
 // PackageDataMaxSize is the maximum size of a package allowed in GoPx registry.
-const PackageDataMaxSize = int64(200 * 1024 * 1024)
+const PackageDataMaxSize = int64(100 * 1024 * 1024)
 
 // PackageMetaFileNames holds the possible file names consisting of GoPx package metadata.
 var PackageMetaFileNames = []string{"gopx.json", "gopx.yaml", "gopx.yml"}

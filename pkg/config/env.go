@@ -12,10 +12,9 @@ const EnvConfigPath = "./config/env.json"
 
 // EnvConfig represents the mapping of environment variables.
 type EnvConfig struct {
-	GoPXVCSAPIIP           string `json:"GoPXVCSAPIIP"`
-	GoPXVCSAPIPort         string `json:"GoPXVCSAPIPort"`
-	GoPXVCSAPIAuthUser     string `json:"GoPXVCSAPIAuthUser"`
-	GoPXVSCAPIAuthPassword string `json:"GoPXVSCAPIAuthPassword"`
+	GoPxVCSAPIIP      string `json:"GoPxVCSAPIIP"`
+	GoPxVCSAPIPort    string `json:"GoPxVCSAPIPort"`
+	GoPxVCSAPIAuthKey string `json:"GoPxVCSAPIAuthKey"`
 }
 
 // Env holds the mapping of environment variables.

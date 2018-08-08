@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-// PackageType represents type of package in vsc registry.
+// PackageType represents type of package in vcs registry.
 type PackageType int
 
 func (p PackageType) String() string {
@@ -50,13 +50,14 @@ type PackageReadmeData struct {
 	Content string `json:"content"`
 }
 
-// RegisterPackage registers a new package to the vsc registry.
+// RegisterPackage registers a new package to the vcs registry.
+// @TODO: Add implementation.
 func RegisterPackage(meta *PackageMeta, data io.Reader) (err error) {
-	//io.Copy(os.Stdout, data)
 	return
 }
 
 // PackageReadme returns the content of README.
+// @TODO: Add implementation.
 func PackageReadme(pkgName, version string) (readme *PackageReadmeData, err error) {
 
 	fakeContent := []byte("Hey, I am README.")
@@ -72,6 +73,7 @@ func PackageReadme(pkgName, version string) (readme *PackageReadmeData, err erro
 }
 
 // DeletePackage removes package data from vcs registry.
+// @TODO: Add implementation.
 func DeletePackage(packageName string) (err error) {
 	return
 }

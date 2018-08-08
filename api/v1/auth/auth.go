@@ -123,6 +123,7 @@ func Parse(auth string) (authType AuthenticationType, err error) {
 }
 
 // CreateHash creates the hash form of the input value.
+// @TODO: Add implementation.
 func CreateHash(value string) string {
 	return value
 }

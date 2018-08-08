@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	golog "log"
 	"net"
 	"net/http"
@@ -24,20 +22,6 @@ func init() {
 
 func main() {
 	startServer()
-	//test()
-}
-
-type xx struct {
-	A *string `json:"b"`
-}
-
-func test() {
-
-	jsonStr := `{ "b": "hh" }`
-	var m xx
-	err := json.Unmarshal([]byte(jsonStr), &m)
-	fmt.Println(err)
-	fmt.Println(*m.A)
 }
 
 func startServer() {
@@ -67,7 +51,7 @@ func startHTTP() {
 		ErrorLog:          serverLogger,
 	}
 
-	log.Info("Running HTTP server on: %s", addr)
+	log.Info("GoPx API service is running on: %s [HTTP]", addr)
 	err := server.ListenAndServe()
 	log.Fatal("Error: %s", err) // err is always non-nill
 }
@@ -85,7 +69,7 @@ func startHTTPS() {
 		ErrorLog:          serverLogger,
 	}
 
-	log.Info("Running HTTPS server on: %s", addr)
+	log.Info("GoPx API service is running on: %s [HTTPS]", addr)
 	err := server.ListenAndServeTLS(config.Service.CertFile, config.Service.KeyFile)
 	log.Fatal("Error: %s", err) // err is always non-nill
 }
