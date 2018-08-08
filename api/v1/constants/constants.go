@@ -53,8 +53,8 @@ const TempFileNamePrefixForPackageRegister = "gopx-pkg-upload-data-"
 // PackageDataMaxSize is the maximum size of a package allowed in GoPx registry.
 const PackageDataMaxSize = int64(200 * 1024 * 1024)
 
-// PackageMetaFileName is the file name consisting of package metadata.
-const PackageMetaFileName = "gopx.json"
+// PackageMetaFileNames holds the possible file names consisting of GoPx package metadata.
+var PackageMetaFileNames = []string{"gopx.json", "gopx.yaml", "gopx.yml"}
 
 // PackageUploadParamName is the param name should be given in package uploading request.
 const PackageUploadParamName = "data"

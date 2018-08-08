@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	yaml "gopkg.in/yaml.v2"
 	"gopx.io/gopx-api/api/v1/constants"
 	"gopx.io/gopx-api/api/v1/controller/helper"
 	"gopx.io/gopx-api/api/v1/controller/pkg"
@@ -595,7 +596,7 @@ func CurrentUserPackagesPOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var wBuff bytes.Buffer
-	ok, err = fs.ReadEntryTarGz(tmpFile, &wBuff, constants.PackageMetaFileName)
+	ok, idx, err := fs.ReadEntryTarGz(tmpFile, &wBuff, constants.PackageMetaFileNames)
 	if err != nil {
 		errorCtrl.Error(w, r, http.StatusBadRequest, fmt.Sprintf("Invalid data or exceeds maximum allowed size %dMB", constants.PackageDataMaxSize/(1024*1024)))
 		return
@@ -609,15 +610,26 @@ func CurrentUserPackagesPOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !ok {
-		errorCtrl.Error(w, r, http.StatusBadRequest, fmt.Sprintf("The %s file not found in package contents", constants.PackageMetaFileName))
+		errorCtrl.Error(w, r, http.StatusBadRequest, fmt.Sprintf("The meta file %s not found in package contents", strings.Join(constants.PackageMetaFileNames, " or ")))
 		return
 	}
 
+	fmt.Println(constants.PackageMetaFileNames[idx])
+
+	metaFileName := constants.PackageMetaFileNames[idx]
 	meta := types.PackageMetaData{}
-	err = json.NewDecoder(&wBuff).Decode(&meta)
-	if err != nil {
-		errorCtrl.Error(w, r, http.StatusBadRequest, fmt.Sprintf("Problems parsing %s file", constants.PackageMetaFileName))
-		return
+	if metaFileName == "gopx.json" {
+		err = json.NewDecoder(&wBuff).Decode(&meta)
+		if err != nil {
+			errorCtrl.Error(w, r, http.StatusBadRequest, fmt.Sprintf("Problems parsing %s file", metaFileName))
+			return
+		}
+	} else {
+		err = yaml.NewDecoder(&wBuff).Decode(&meta)
+		if err != nil {
+			errorCtrl.Error(w, r, http.StatusBadRequest, fmt.Sprintf("Problems parsing %s file", metaFileName))
+			return
+		}
 	}
 
 	err = pkg.SanitizePackageMeta(&meta)

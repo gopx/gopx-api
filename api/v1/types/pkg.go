@@ -53,24 +53,24 @@ type PackageVersion struct {
 	ReleasedAt time.Time `json:"releasedAt"`
 }
 
-// PackageMetaData holds the metadata of a gopx package i.e. contents of the gopx.json file.
+// PackageMetaData holds the metadata of a gopx package i.e. contents of the gopx.json or gopx.yaml or gopx.yml file.
 type PackageMetaData struct {
-	Name             string                 `json:"name"`
-	Version          string                 `json:"version"`
-	Description      string                 `json:"description"`
-	HomepageURL      string                 `json:"homepage"`
-	Tags             []string               `json:"tags"`
-	License          string                 `json:"license"`
-	BugsURL          string                 `json:"bugsURL"`
-	RepositoryURL    string                 `json:"repository"`
-	DocumentationURL string                 `json:"docs"`
-	Engines          PackageMetaDataEngines `json:"engines"`
-	Os               []string               `json:"os"`
+	Name             string                 `json:"name" yaml:"name"`
+	Version          string                 `json:"version" yaml:"version"`
+	Description      string                 `json:"description" yaml:"description"`
+	HomepageURL      string                 `json:"homepage" yaml:"homepage"`
+	Tags             []string               `json:"tags" yaml:"tags"`
+	License          string                 `json:"license" yaml:"license"`
+	BugsURL          string                 `json:"bugsURL" yaml:"bugsURL"`
+	RepositoryURL    string                 `json:"repository" yaml:"repository"`
+	DocumentationURL string                 `json:"docs" yaml:"docs"`
+	Engines          PackageMetaDataEngines `json:"engines" yaml:"engines"`
+	Os               []string               `json:"os" yaml:"os"`
 }
 
 // PackageMetaDataEngines holds the engines metadata of a gopx package.
 type PackageMetaDataEngines struct {
-	Go string `json:"go"`
+	Go string `json:"go" yaml:"go"`
 }
 
 // PackageReadme holds the contents of README.
