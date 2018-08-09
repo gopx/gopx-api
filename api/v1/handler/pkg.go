@@ -89,7 +89,7 @@ func PackagesGET(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	helper.WriteResponseJSONOk(w, r, pkgs)
+	helper.WriteResponseValueOK(w, r, pkgs)
 }
 
 // SinglePackageGET returns the info about a single package.
@@ -133,7 +133,7 @@ func SinglePackageGET(w http.ResponseWriter, r *http.Request) {
 		Os: listOsNames(pr.OS),
 	}
 
-	helper.WriteResponseJSONOk(w, r, pkg)
+	helper.WriteResponseValueOK(w, r, pkg)
 }
 
 // SearchPackagesGET performs a search query among all public packages.
@@ -232,7 +232,7 @@ func SearchPackagesGET(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	helper.WriteResponseJSONOk(w, r, pkgs)
+	helper.WriteResponseValueOK(w, r, pkgs)
 }
 
 // DownloadsGET returns the list of download counts for all public packages.
@@ -268,7 +268,7 @@ func DownloadsGET(w http.ResponseWriter, r *http.Request) {
 			Downloads: rDownloads,
 		}
 
-		helper.WriteResponseJSONOk(w, r, rd)
+		helper.WriteResponseValueOK(w, r, rd)
 		return
 	}
 
@@ -309,7 +309,7 @@ func DownloadsGET(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	helper.WriteResponseJSONOk(w, r, pDownloads)
+	helper.WriteResponseValueOK(w, r, pDownloads)
 }
 
 // SinglePackageVersionsGET returns the version histories of a single package.
@@ -342,7 +342,7 @@ func SinglePackageVersionsGET(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	helper.WriteResponseJSONOk(w, r, pvh)
+	helper.WriteResponseValueOK(w, r, pvh)
 }
 
 // SinglePackageReadmeGET returns the content of README file.
@@ -409,5 +409,5 @@ func SinglePackageReadmeGET(w http.ResponseWriter, r *http.Request) {
 		Content: readmeData.Content,
 	}
 
-	helper.WriteResponseJSONOk(w, r, readmeResp)
+	helper.WriteResponseValueOK(w, r, readmeResp)
 }

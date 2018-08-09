@@ -18,7 +18,7 @@ func setBasicHeaders(headers http.Header) {
 	headers.Set("Access-Control-Allow-Origin", "*")
 }
 
-// WriteResponse writes response data to the client with the specified status code.
+// WriteResponse writes JSON data to the client with the specified status code.
 func WriteResponse(w http.ResponseWriter, r *http.Request, data []byte, statusCode int) {
 	headers := w.Header()
 	setBasicHeaders(headers)
@@ -33,8 +33,9 @@ func WriteResponse(w http.ResponseWriter, r *http.Request, data []byte, statusCo
 	}
 }
 
-// WriteResponseJSON writes the JSON response to the client with the specified status code.
-func WriteResponseJSON(w http.ResponseWriter, r *http.Request, data interface{}, statusCode int) {
+// WriteResponseValue writes the input golang value in the form of JSON encoding
+// to the client with the specified status code.
+func WriteResponseValue(w http.ResponseWriter, r *http.Request, data interface{}, statusCode int) {
 	buff := bytes.Buffer{}
 	enc := json.NewEncoder(&buff)
 	enc.SetIndent("", "  ")
@@ -50,7 +51,8 @@ func WriteResponseJSON(w http.ResponseWriter, r *http.Request, data interface{},
 	WriteResponse(w, r, buff.Bytes(), statusCode)
 }
 
-// WriteResponseJSONOk writes the JSON response to the client with "200 OK" status.
-func WriteResponseJSONOk(w http.ResponseWriter, r *http.Request, data interface{}) {
-	WriteResponseJSON(w, r, data, http.StatusOK)
+// WriteResponseValueOK writes the input golang value in the form of JSON encoding
+// to the client with "200 OK" status.
+func WriteResponseValueOK(w http.ResponseWriter, r *http.Request, data interface{}) {
+	WriteResponseValue(w, r, data, http.StatusOK)
 }

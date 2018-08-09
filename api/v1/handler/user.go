@@ -94,7 +94,7 @@ func UsersGET(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	helper.WriteResponseJSONOk(w, r, users)
+	helper.WriteResponseValueOK(w, r, users)
 }
 
 // SingleUserGET returns the public information about a single user.
@@ -137,7 +137,7 @@ func SingleUserGET(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	helper.WriteResponseJSONOk(w, r, user)
+	helper.WriteResponseValueOK(w, r, user)
 }
 
 // CurrentUserGET returns the public and private information of the authenticated user.
@@ -181,7 +181,7 @@ func CurrentUserGET(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	helper.WriteResponseJSONOk(w, r, user)
+	helper.WriteResponseValueOK(w, r, user)
 }
 
 // SearchUsersGET performs a search query among all users.
@@ -276,7 +276,7 @@ func SearchUsersGET(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	helper.WriteResponseJSONOk(w, r, users)
+	helper.WriteResponseValueOK(w, r, users)
 }
 
 // CurrentUserPATCH updates data to the authenticated user.
@@ -351,7 +351,7 @@ func CurrentUserPATCH(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	helper.WriteResponseJSONOk(w, r, user)
+	helper.WriteResponseValueOK(w, r, user)
 }
 
 // SingleUserPackagesGET returns the list of public packages of a single user.
@@ -441,7 +441,7 @@ func SingleUserPackagesGET(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	helper.WriteResponseJSONOk(w, r, pkgs)
+	helper.WriteResponseValueOK(w, r, pkgs)
 }
 
 // CurrentUserPackagesGET returns the list of all packages of the authenticated user.
@@ -536,7 +536,7 @@ func CurrentUserPackagesGET(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	helper.WriteResponseJSONOk(w, r, pkgs)
+	helper.WriteResponseValueOK(w, r, pkgs)
 }
 
 // CurrentUserPackagesPOST register a new package of a authenticated user.
@@ -710,7 +710,7 @@ func CurrentUserPackagesPOST(w http.ResponseWriter, r *http.Request) {
 		Os: listOsNames(fPkg.OS),
 	}
 
-	helper.WriteResponseJSON(w, r, pkgData, http.StatusCreated)
+	helper.WriteResponseValue(w, r, pkgData, http.StatusCreated)
 }
 
 func readPackageData(mr *multipart.Reader, w io.Writer) (ok bool, err error) {
