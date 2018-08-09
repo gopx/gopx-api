@@ -22,12 +22,11 @@ func (p PackageType) String() string {
 const (
 	// PackageTypePublic indicates the package is public.
 	PackageTypePublic PackageType = iota
-	// PackageTypePrivate indicates the package is private,
-	// requires Authentication to access it.
+	// PackageTypePrivate indicates the package is private.
 	PackageTypePrivate
 )
 
-// PackageMeta represents the package data required for vcs registry.
+// PackageMeta represents the package meta info required for vcs registry.
 type PackageMeta struct {
 	Type    PackageType  `json:"type"`
 	Name    string       `json:"name"`

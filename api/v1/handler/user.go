@@ -539,7 +539,7 @@ func CurrentUserPackagesGET(w http.ResponseWriter, r *http.Request) {
 	helper.WriteResponseValueOK(w, r, pkgs)
 }
 
-// CurrentUserPackagesPOST register a new package of a authenticated user.
+// CurrentUserPackagesPOST registers a new package of a authenticated user.
 // Request: POST /user/packages
 func CurrentUserPackagesPOST(w http.ResponseWriter, r *http.Request) {
 	ur, err := authUser(r.Header.Get("Authorization"))
