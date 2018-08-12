@@ -1,6 +1,8 @@
 package error
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
 )
 
@@ -32,4 +34,19 @@ func Error405(w http.ResponseWriter, r *http.Request) {
 // Error500 handles request with internal server error.
 func Error500(w http.ResponseWriter, r *http.Request) {
 	Error(w, r, http.StatusInternalServerError, "Internal Server Error")
+}
+
+// DecodeErrorMessage extracts the message part of error encoded response data.
+func DecodeErrorMessage(errData []byte) (message string, err error) {
+	r := bytes.NewReader(errData)
+
+	var oErrResp errorResponse
+	err = json.NewDecoder(r).Decode(&oErrResp)
+	if err != nil {
+		return
+	}
+
+	message = oErrResp.Message
+
+	return
 }
