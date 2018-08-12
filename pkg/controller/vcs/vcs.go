@@ -1,7 +1,6 @@
 package vcs
 
 import (
-	"encoding/base64"
 	"io"
 )
 
@@ -41,33 +40,9 @@ type PackageOwner struct {
 	Username    string `json:"username"`
 }
 
-// PackageReadmeData holds the package README content in base64 format.
-type PackageReadmeData struct {
-	Name    string `json:"name"`
-	Version string `json:"version"`
-	Size    uint64 `json:"size"`
-	Content string `json:"content"`
-}
-
 // RegisterPackage registers a new package to the vcs registry.
 // @TODO: Add implementation.
 func RegisterPackage(meta *PackageMeta, data io.Reader) (err error) {
-	return
-}
-
-// PackageReadme returns the content of README.
-// @TODO: Add implementation.
-func PackageReadme(pkgName, version string) (readme *PackageReadmeData, err error) {
-
-	fakeContent := []byte("Hey, I am README.")
-
-	readme = &PackageReadmeData{
-		Name:    "README.md",
-		Version: version,
-		Size:    uint64(len(fakeContent)),
-		Content: base64.StdEncoding.EncodeToString(fakeContent),
-	}
-
 	return
 }
 

@@ -16,7 +16,6 @@ import (
 	"gopx.io/gopx-api/api/v1/controller/pkg"
 	"gopx.io/gopx-api/api/v1/types"
 	errorCtrl "gopx.io/gopx-api/pkg/controller/error"
-	"gopx.io/gopx-api/pkg/controller/vcs"
 	"gopx.io/gopx-common/log"
 )
 
@@ -390,15 +389,10 @@ func SinglePackageReadmeGET(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	readmeData, err := vcs.PackageReadme(inputPkgName, inputVersion)
+	readmeData, err := pkg.Readme(pkgRows[0].ID, inputVersion)
 	if err != nil {
 		log.Error("Error %s", err)
 		errorCtrl.Error500(w, r)
-		return
-	}
-
-	if readmeData == nil {
-		errorCtrl.Error(w, r, http.StatusNotFound, fmt.Sprintf("No README found for the version %s", inputVersion))
 		return
 	}
 

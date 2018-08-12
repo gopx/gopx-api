@@ -3,6 +3,7 @@ package pkg
 import (
 	"bytes"
 	"database/sql"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"strings"
@@ -68,6 +69,14 @@ type VersionHistory struct {
 type SingleVersion struct {
 	Version    string
 	ReleasedAT time.Time
+}
+
+// ReadmeData holds the package README content in base64 format.
+type ReadmeData struct {
+	Name    string `json:"name"`
+	Version string `json:"version"`
+	Size    uint64 `json:"size"`
+	Content string `json:"content"`
 }
 
 // Search searches packages according to the search query and returns a slice containing
@@ -872,5 +881,43 @@ func VersionExists(pkgName, inpVersion string) (ok bool, err error) {
 
 func defaultPackageReadme(pkgName string) (content []byte) {
 	content = []byte(fmt.Sprintf("No readme found for package %s", pkgName))
+	return
+}
+
+// Readme returns the README content of a package.
+func Readme(packageID uint64, version string) (content *ReadmeData, err error) {
+	sqlSt := `
+	SELECT name, file_size, content
+	FROM package_readme
+	WHERE package_id = ? and version = ?
+	ORDER BY id ASC
+	LIMIT 1
+	`
+	var (
+		readmeName    string
+		size          uint64
+		readmeContent []byte
+	)
+
+	dbConn := database.Conn()
+	err = dbConn.QueryRow(sqlSt, packageID, version).Scan(&readmeName, &size, &readmeContent)
+	if err != nil {
+		switch {
+		case err == sql.ErrNoRows:
+			err = errors.Wrapf(err, "Package not found")
+			return
+		default:
+			err = errors.Wrapf(err, "Failed to read README data from package_readme table")
+			return
+		}
+	}
+
+	content = &ReadmeData{
+		Name:    readmeName,
+		Version: version,
+		Size:    size,
+		Content: base64.StdEncoding.EncodeToString(readmeContent),
+	}
+
 	return
 }
