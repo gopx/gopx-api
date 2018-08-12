@@ -1,0 +1,24 @@
+name: gohttp
+version: 0.0.6
+description: Http implementation in Golang
+homepage: https://github.com/rousan/linkedin-auto-connect#readme
+commands:
+  start: go run cmd/main.go
+  test: go test ./...
+tags:
+  - golang
+  - implementation
+  - web
+  - server
+  - http
+  - https
+license: MIT
+bugsUrl: https://github.com/rousan/linkedin-auto-connect/issues
+repository: https://github.com/rousan/linkedin-auto-connect
+docs: https://github.com/rousan/linkedin-auto-connect#readme
+engines:
+  go: '>=1.02'
+os:
+  - darwin:amd64
+  - linux
+  - windows

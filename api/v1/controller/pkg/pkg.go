@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
 	"io"
@@ -15,6 +16,7 @@ import (
 	"gopx.io/gopx-api/pkg/controller/database"
 	"gopx.io/gopx-api/pkg/controller/vcs"
 	"gopx.io/gopx-common/arr"
+	"gopx.io/gopx-common/fs"
 	"gopx.io/gopx-common/misc"
 	"gopx.io/gopx-common/str"
 )
@@ -545,7 +547,7 @@ func SanitizePackageMeta(meta *types.PackageMetaData) (err error) {
 }
 
 // InsertNew inserts a new package to the database and registers to the vcs registry.
-func InsertNew(meta *types.PackageMetaData, data io.Reader, ownerInfo *user.QueryRow) (pkg *QueryRow, err error) {
+func InsertNew(meta *types.PackageMetaData, data io.ReadSeeker, ownerInfo *user.QueryRow) (pkg *QueryRow, err error) {
 	dbConn := database.Conn()
 	tx, err := dbConn.Begin()
 	if err != nil {
@@ -622,6 +624,47 @@ func InsertNew(meta *types.PackageMetaData, data io.Reader, ownerInfo *user.Quer
 	}
 	prepSt.Close()
 
+	var readmeBuff bytes.Buffer
+	ok, idx, err := fs.ReadEntryTarGz(data, &readmeBuff, constants.ReadmeFileNames)
+	if err != nil {
+		tx.Rollback()
+		err = errors.Wrapf(err, "Failed to retrive README file")
+		return
+	}
+
+	var readmeFileName string
+	var readmeContent []byte
+	if ok {
+		readmeFileName = constants.ReadmeFileNames[idx]
+		readmeContent = readmeBuff.Bytes()
+		if len(readmeContent) == 0 {
+			readmeContent = defaultPackageReadme(meta.Name)
+		}
+	} else {
+		readmeFileName = constants.DefaultReadmeFileName
+		readmeContent = defaultPackageReadme(meta.Name)
+	}
+
+	st = `
+	INSERT INTO package_readme
+	(package_id, version, name, file_size, content)
+	VALUES 
+	(?, ?, ?, ?, ?)
+	`
+	_, err = tx.Exec(st, packageID, meta.Version, readmeFileName, len(readmeContent), readmeContent)
+	if err != nil {
+		tx.Rollback()
+		err = errors.Wrap(err, "Failed to insert package data to package_readme table")
+		return
+	}
+
+	_, err = data.Seek(0, 0)
+	if err != nil {
+		tx.Rollback()
+		err = errors.Wrapf(err, "Failed to seek the data reader to starting position")
+		return
+	}
+
 	vcsMeta := &vcs.PackageMeta{
 		Type:    vcs.PackageTypePublic,
 		Name:    meta.Name,
@@ -656,7 +699,7 @@ func InsertNew(meta *types.PackageMetaData, data io.Reader, ownerInfo *user.Quer
 }
 
 // MakeNewRelease creates a new release/version to the database and registers that version to the vcs registry.
-func MakeNewRelease(packageID uint64, meta *types.PackageMetaData, data io.Reader, ownerInfo *user.QueryRow) (pkg *QueryRow, err error) {
+func MakeNewRelease(packageID uint64, meta *types.PackageMetaData, data io.ReadSeeker, ownerInfo *user.QueryRow) (pkg *QueryRow, err error) {
 	dbConn := database.Conn()
 	tx, err := dbConn.Begin()
 	if err != nil {
@@ -735,6 +778,47 @@ func MakeNewRelease(packageID uint64, meta *types.PackageMetaData, data io.Reade
 	}
 	prepSt.Close()
 
+	var readmeBuff bytes.Buffer
+	ok, idx, err := fs.ReadEntryTarGz(data, &readmeBuff, constants.ReadmeFileNames)
+	if err != nil {
+		tx.Rollback()
+		err = errors.Wrapf(err, "Failed to retrive README file")
+		return
+	}
+
+	var readmeFileName string
+	var readmeContent []byte
+	if ok {
+		readmeFileName = constants.ReadmeFileNames[idx]
+		readmeContent = readmeBuff.Bytes()
+		if len(readmeContent) == 0 {
+			readmeContent = defaultPackageReadme(meta.Name)
+		}
+	} else {
+		readmeFileName = constants.DefaultReadmeFileName
+		readmeContent = defaultPackageReadme(meta.Name)
+	}
+
+	st = `
+	INSERT INTO package_readme
+	(package_id, version, name, file_size, content)
+	VALUES 
+	(?, ?, ?, ?, ?)
+	`
+	_, err = tx.Exec(st, packageID, meta.Version, readmeFileName, len(readmeContent), readmeContent)
+	if err != nil {
+		tx.Rollback()
+		err = errors.Wrap(err, "Failed to insert package data to package_readme table")
+		return
+	}
+
+	_, err = data.Seek(0, 0)
+	if err != nil {
+		tx.Rollback()
+		err = errors.Wrapf(err, "Failed to seek the data reader to starting position")
+		return
+	}
+
 	vcsMeta := &vcs.PackageMeta{
 		Type:    vcs.PackageTypePublic,
 		Name:    meta.Name,
@@ -783,5 +867,10 @@ func VersionExists(pkgName, inpVersion string) (ok bool, err error) {
 		}
 	}
 
+	return
+}
+
+func defaultPackageReadme(pkgName string) (content []byte) {
+	content = []byte(fmt.Sprintf("No readme found for package %s", pkgName))
 	return
 }

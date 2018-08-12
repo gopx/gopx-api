@@ -58,3 +58,9 @@ var PackageMetaFileNames = []string{"gopx.json", "gopx.yaml", "gopx.yml"}
 
 // PackageUploadParamName is the param name should be given in package uploading request.
 const PackageUploadParamName = "data"
+
+// ReadmeFileNames holds the possible file names of package README.
+var ReadmeFileNames = []string{"README.md", "README.MD", "readme.md", "ReadMe.md", "README", "readme"}
+
+// DefaultReadmeFileName is the default file name of package README.
+var DefaultReadmeFileName = ReadmeFileNames[0]

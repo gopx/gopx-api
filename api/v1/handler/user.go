@@ -595,8 +595,8 @@ func CurrentUserPackagesPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var wBuff bytes.Buffer
-	ok, idx, err := fs.ReadEntryTarGz(tmpFile, &wBuff, constants.PackageMetaFileNames)
+	var pkgMetaBuff bytes.Buffer
+	ok, idx, err := fs.ReadEntryTarGz(tmpFile, &pkgMetaBuff, constants.PackageMetaFileNames)
 	if err != nil {
 		errorCtrl.Error(w, r, http.StatusBadRequest, fmt.Sprintf("Invalid data or exceeds maximum allowed size %dMB", constants.PackageDataMaxSize/(1024*1024)))
 		return
@@ -617,13 +617,13 @@ func CurrentUserPackagesPOST(w http.ResponseWriter, r *http.Request) {
 	metaFileName := constants.PackageMetaFileNames[idx]
 	meta := types.PackageMetaData{}
 	if metaFileName == "gopx.json" {
-		err = json.NewDecoder(&wBuff).Decode(&meta)
+		err = json.NewDecoder(&pkgMetaBuff).Decode(&meta)
 		if err != nil {
 			errorCtrl.Error(w, r, http.StatusBadRequest, fmt.Sprintf("Problems parsing %s file", metaFileName))
 			return
 		}
 	} else {
-		err = yaml.NewDecoder(&wBuff).Decode(&meta)
+		err = yaml.NewDecoder(&pkgMetaBuff).Decode(&meta)
 		if err != nil {
 			errorCtrl.Error(w, r, http.StatusBadRequest, fmt.Sprintf("Problems parsing %s file", metaFileName))
 			return
