@@ -476,6 +476,17 @@ func DeletePackage(packageName string) (err error) {
 	}
 
 	st = `
+	DELETE FROM package_readme
+	WHERE package_id = ?
+	`
+	_, err = tx.Exec(st, packageID)
+	if err != nil {
+		tx.Rollback()
+		err = errors.Wrap(err, "Failed to delete package data from package_readme table")
+		return
+	}
+
+	st = `
 	DELETE FROM package_downloads
 	WHERE package_id = ?
 	`

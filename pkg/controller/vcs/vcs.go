@@ -140,9 +140,42 @@ func RegisterPackage(meta *PackageMeta, data io.Reader) (err error) {
 }
 
 // DeletePackage removes package data from vcs registry.
-// @TODO: Add implementation.
 func DeletePackage(packageName string) (err error) {
+	reqPath := fmt.Sprintf("/v1/packages/%s", packageName)
+	reqMethod := http.MethodDelete
+
+	req, err := http.NewRequest(reqMethod, createReqURL(reqPath), http.NoBody)
+	if err != nil {
+		err = errors.Wrap(err, "Failed to create the request")
+		return
+	}
+	req.Header.Set("Authorization", createAuthHeader())
+	req.Header.Set("User-Agent", "GoPx API Service")
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		err = errors.Wrap(err, "Failed to send the request")
+		return
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusNoContent {
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			err = errors.Wrap(err, "Failed to read the response")
+			return err
+		}
+		msg, err := errorCtrl.DecodeErrorMessage(body)
+		if err != nil {
+			err = errors.Wrap(err, "Failed to decode error response")
+			return err
+		}
+
+		return errors.Errorf("Response code %d: %s", res.StatusCode, msg)
+	}
+
 	return
+
 }
 
 func createReqURL(path string) string {
